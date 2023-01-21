@@ -1,1 +1,1 @@
-name_app_vacancies = 'vacancies'
+APP_VACANCIES = 'vacancies'

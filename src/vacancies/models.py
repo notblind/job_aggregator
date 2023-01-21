@@ -4,7 +4,7 @@ from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declared_attr
 
 from src.database import Base
-from src.vacancies.constants import name_app_vacancies
+from src.vacancies.constants import APP_VACANCIES
 
 
 class BaseVacancies(Base):
@@ -14,7 +14,7 @@ class BaseVacancies(Base):
 
     @declared_attr
     def __tablename__(cls):
-        return f'{name_app_vacancies}_{cls.__table_name__}'
+        return f'{APP_VACANCIES}_{cls.__table_name__}'
 
 
 class Town(BaseVacancies):
