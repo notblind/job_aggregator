@@ -1,7 +1,7 @@
 from celery import Celery
 from fastapi import FastAPI
 
-import settings
+from src.settings import REDIS_HOST, REDIS_PORT, REDIS_DB
 
 
 app = FastAPI(
@@ -9,12 +9,8 @@ app = FastAPI(
     version='0.0.1',
 )
 
-celery = Celery(
+celery_app = Celery(
     __name__,
-    broker=f'redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}',
-    backend=f'redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}',
+    broker=f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+    backend=f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
 )
-
-celery.conf.imports = [
-    'vacancies.tasks'
-]
