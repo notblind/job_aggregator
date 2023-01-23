@@ -10,7 +10,7 @@ app = FastAPI(
 )
 
 celery_app = Celery(
-    __name__,
+    'vacancies',
     broker=f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
     backend=f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
 )

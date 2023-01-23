@@ -31,3 +31,19 @@ services:
       - inet
     depends_on:
       - db
+
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    expose:
+      - 6379
+
+  celery:
+    container_name: celery
+    build: .
+    command: celery -A src.main.celery_app worker --beat --loglevel=info
+    volumes:
+      - .:/vacancies
+    depends_on:
+      - redis
+      - fastapi
