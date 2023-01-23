@@ -1,6 +1,6 @@
-from src.main import celery_app
+from src.celery_config import app
 
 
-@celery_app.task
+@app.task
 def collect_vacancies_from_hh():
     pass
