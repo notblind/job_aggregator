@@ -3,6 +3,7 @@
 .idea/
 r,
 **/__pycache__/
+*.pyc
 .DS_Store
 
 celerybeat-schedule

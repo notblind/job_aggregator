@@ -9,6 +9,6 @@ imports = ['src.vacancies.tasks']
 beat_schedule = {
     'collect_vacancies_from_hh': {
         'task': 'src.vacancies.tasks.collect_vacancies_from_hh',
-        'schedule': 30
+        'schedule': 60
     }
 }
