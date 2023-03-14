@@ -25,10 +25,12 @@ services:
     build: .
     command: bash -c 'alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload'
     volumes:
-      - .:/app
+      - .:/vacancies
     ports:
       - "8000:8000"
     restart: always
+    environment:
+      DEBUG: 1
     networks:
       - inet
     depends_on:
