@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from src.settings import HH_URL
 from src.celery_app.app import app
 from src.database import Session
-from src.vacancies.models import Platform, Vacancy
+from src.vacancies.models import Platform, Vacancy, Town
 from src.vacancies.pydantic_models import PydanticVacancy
 
 _logger = logging.getLogger(__name__)
@@ -31,6 +31,7 @@ def collect_vacancies_from_hh():
             _logger.error('No hh platform')
             return
         platform = platform[0]
+        towns = session.query(Town)
 
         try:
             while page < 100:
@@ -42,6 +43,16 @@ def collect_vacancies_from_hh():
                             address = item.get('address') if item.get('address') else {}
                             salary = item.get('salary') if item.get('salary') else {}
                             snippet = item.get('snippet') if item.get('snippet') else {}
+                            town = (item.get('area') if item.get('area') else {}).get('name')
+                            if town:
+                                filter_towns = [db_town for db_town in towns if town == db_town.name]
+                                _logger.error(filter_towns)
+                                if filter_towns:
+                                    town = filter_towns[0]
+                                else:
+                                    town = Town(name=town)
+                                    session.add(town)
+                                    session.flush()
                             vacancy = PydanticVacancy(
                                 resource_id=item.get('id'),
                                 platform_id=platform.id,
@@ -54,6 +65,7 @@ def collect_vacancies_from_hh():
                                 requirement=snippet.get('requirement') if snippet.get('requirement') else '',
                                 responsibility=snippet.get('responsibility') if snippet.get('responsibility') else '',
                                 company='',
+                                town_id=town.id,
                             )
                             objects.append(Vacancy(**vacancy.dict()))
                         except ValidationError as e:

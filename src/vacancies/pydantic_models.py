@@ -13,3 +13,4 @@ class PydanticVacancy(BaseModel):
     requirement: str = ''
     responsibility: str = ''
     company: str = ''
+    town_id: int = None
