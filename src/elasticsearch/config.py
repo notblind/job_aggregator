@@ -44,10 +44,10 @@ POSTS_INDEX_SETTINGS = {
 POSTS_INDEX_MAPPINGS = {
     "properties": {
         "address": {"type": "text"},
-        "town": {"type": "text"},
+        "town_id": {"type": "text"},
         "salary_from": {"type": "float"},
         "salary_to": {"type": "float"},
-        "title": {
+        "name": {
             "type": "text",
             "search_analyzer": "post_search_analyzer",
             "fields": {

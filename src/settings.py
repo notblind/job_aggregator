@@ -19,3 +19,7 @@ REDIS_DB = os.environ.get("REDIS_DB")
 
 # API
 HH_URL = os.environ.get("HH_URL")
+
+# Elasticsearch
+ELASTIC_URL = os.environ.get("ELASTIC_URL")
+ELASTIC_INDEX = os.environ.get("ELASTIC_INDEX")

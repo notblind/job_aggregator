@@ -1,57 +1,51 @@
 import argparse
-import json
 import logging
-import pathlib
 import sys
 
 from elasticsearch import Elasticsearch
 
+from src.settings import ELASTIC_URL, ELASTIC_INDEX
 from src.elasticsearch.config import POSTS_INDEX_SETTINGS, POSTS_INDEX_MAPPINGS
+from src.vacancies.document import get_hh_document
 
 
 _logger = logging.getLogger(__name__)
 
-es_client = Elasticsearch('http://localhost:9200')
-
-POSTS_INDEX_NAME = 'vacancy'
-POSTS_DATA_PATH = pathlib.Path(__file__).parent.parent.joinpath(
-    "data/Lynn-Kwong-Medium-Posts.json"
-)
+es_client = Elasticsearch(ELASTIC_URL)
 
 
 def recreate_index():
     """Rebuild the ES index."""
-    es_client.options(ignore_status=404).indices.delete(index=POSTS_INDEX_NAME)
-    logging.info("Index `%s` is deleted if existing.", POSTS_INDEX_NAME)
+    es_client.options(ignore_status=404).indices.delete(index=ELASTIC_INDEX)
+    logging.info("Index `%s` is deleted if existing.", ELASTIC_INDEX)
     es_client.indices.create(
-        index=POSTS_INDEX_NAME,
+        index=ELASTIC_INDEX,
         settings=POSTS_INDEX_SETTINGS,
         mappings=POSTS_INDEX_MAPPINGS,
     )
-    _logger.info("Index `%s` is (re-)created.", POSTS_INDEX_NAME)
+    _logger.info("Index `%s` is (re-)created.", ELASTIC_INDEX)
 
 
 def load_documents_to_index():
     """Load post documents to the Elasticsearch index."""
     es_actions = []
 
-    posts = [] # data from bd
+    data = get_hh_document()
 
-    for post in posts:
-        # Note that the _id field is not allowed in Elasticsearch as it's a builtin field.
+    for item in data:
         action = {
-            "index": {"_index": POSTS_INDEX_NAME, "_id": post.pop("_id")}
+            "index": {"_index": ELASTIC_INDEX, "_id": item.pop("id")}
         }
         es_actions.append(action)
-        es_actions.append(post)
+        es_actions.append(item)
 
     es_client.bulk(
-        index=POSTS_INDEX_NAME,
+        index=ELASTIC_INDEX,
         operations=es_actions,
         filter_path="took,errors",
     )
 
-    _logger.info("%s posts have been indexed.", len(posts))
+    _logger.info("%s posts have been indexed.", len(data))
 
 
 if __name__ == '__main__':
@@ -70,7 +64,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if (
-        not es_client.indices.exists(index=POSTS_INDEX_NAME)
+        not es_client.indices.exists(index=ELASTIC_INDEX)
         or args.recreate_index
     ):
         recreate_index()
