@@ -55,3 +55,20 @@ services:
       - fastapi
     networks:
       - inet
+
+  elasticsearch:
+    image: elasticsearch:8.6.2
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - inet
+
+volumes:
+  elasticsearch-data:
+    driver: local
