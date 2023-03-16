@@ -45,7 +45,7 @@ def load_documents_to_index():
         filter_path="took,errors",
     )
 
-    _logger.info("%s posts have been indexed.", len(data))
+    _logger.info("%s items have been indexed.", len(data))
 
 
 if __name__ == '__main__':
