@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
 
 from src.database import Base
@@ -22,6 +22,7 @@ class Town(BaseVacancies):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    id_hh = Column(Integer)
 
 
 class Currency(BaseVacancies):
@@ -42,7 +43,7 @@ class Platform(BaseVacancies):
     __table_name__ = 'platform'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     url = Column(String, nullable=False)
 
 

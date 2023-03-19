@@ -1,6 +1,6 @@
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -16,9 +16,6 @@ DB_NAME = os.environ.get("DB_NAME")
 REDIS_HOST = os.environ.get("REDIS_HOST")
 REDIS_PORT = os.environ.get("REDIS_PORT")
 REDIS_DB = os.environ.get("REDIS_DB")
-
-# API
-HH_URL = os.environ.get("HH_URL")
 
 # Elasticsearch
 ELASTIC_URL = os.environ.get("ELASTIC_URL")
