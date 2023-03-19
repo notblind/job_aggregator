@@ -13,6 +13,10 @@ beat_schedule = {
         'task': 'src.vacancies.tasks.collect_vacancies_from_hh',
         'schedule': crontab(hour=1)
     },
+    'collect_vacancies_from_vk': {
+        'task': 'src.vacancies.tasks.collect_vacancies_from_vk',
+        'schedule': crontab(hour=2)
+    },
     'reindex_elasticsearch': {
         'task': 'src.elasticsearch.tasks.reindex_elasticsearch',
         'schedule': crontab(hour=6)
