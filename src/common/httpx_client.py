@@ -13,7 +13,7 @@ class ClientHttpx:
         if cls.httpx_client is None:
             timeout = httpx.Timeout(timeout=HTTPX_TIMEOUT)
             limits = httpx.Limits(max_keepalive_connections=HTTPX_KEEP_ALIVE, max_connections=HTTPX_MAX_CONNECTIONS)
-            cls.httpx_client = httpx.AsyncClient(timeout=timeout, limits=limits)
+            cls.httpx_client = httpx.AsyncClient(timeout=timeout, limits=limits, http2=True)
 
         return cls.httpx_client
 
