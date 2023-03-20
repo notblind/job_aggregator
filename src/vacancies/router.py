@@ -7,7 +7,6 @@ from src.database import get_async_session
 from src.elasticsearch.client import get_es_client
 from src.settings import ELASTIC_INDEX
 from src.vacancies.models import Vacancy
-from src.vacancies.tasks import collect_vacancies_from_vk
 
 router = APIRouter(
     prefix='/vacancies/v1',
@@ -32,8 +31,6 @@ async def get_posts_from_elastic(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Please provide a valid query",
         )
-
-    collect_vacancies_from_vk.delay()
 
     search_query = {
         "multi_match": {
