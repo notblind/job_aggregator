@@ -7,6 +7,7 @@ from src.database import get_async_session
 from src.elasticsearch.client import get_es_client
 from src.settings import ELASTIC_INDEX
 from src.vacancies.models import Vacancy
+from src.vacancies.platform_api_async import request_vacancy
 
 router = APIRouter(
     prefix='/vacancies/v1',
@@ -19,6 +20,19 @@ async def api_vacancies(session: AsyncSession = Depends(get_async_session)):
     query = select(Vacancy)
     result = await session.execute(query)
     return result.all()
+
+
+@router.get('/vacancies/{item_id}')
+async def api_vacancies(item_id: str, session: AsyncSession = Depends(get_async_session)):
+    query = select(Vacancy).where(Vacancy.id == item_id)
+    result = await session.execute(query)
+    if result:
+        return await request_vacancy(result)
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Please provide a valid query",
+    )
 
 
 @router.get("/vacancies_es")
