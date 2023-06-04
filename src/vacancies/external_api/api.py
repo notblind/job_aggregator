@@ -18,9 +18,7 @@ class ExternalApi:
             params = {}
         if not headers:
             headers = {}
-        _logger.error(method)
-        _logger.error(url)
-        _logger.error(params)
+
         try:
             response = requests.request(
                 method,
