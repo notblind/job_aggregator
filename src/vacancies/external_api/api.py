@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 
 
 class ExternalApi:
-
+    LIMIT_DATA = 0
     DEFAULT_API_TIMEOUT = 300
     DEFAULT_PAGE_NAME = "page"
     DEFAULT_OFFSET_NAME = "offset"
@@ -18,7 +18,9 @@ class ExternalApi:
             params = {}
         if not headers:
             headers = {}
-
+        _logger.error(method)
+        _logger.error(url)
+        _logger.error(params)
         try:
             response = requests.request(
                 method,
@@ -44,7 +46,7 @@ class ExternalApi:
         if not params:
             params = {}
         page = 1
-        while page:
+        while page and (not self.LIMIT_DATA or page < self.LIMIT_DATA):
             params[self.DEFAULT_PAGE_NAME] = page
             response = self.make_request(method, url, params, headers)
             yield response

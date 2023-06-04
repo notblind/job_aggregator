@@ -1,44 +1,44 @@
 from datetime import datetime, timedelta
 
-from src.vacancies.constants import PLATFORM_CODE
 from src.vacancies.external_api.api import ExternalApi
 from src.vacancies.models import Vacancy
 from src.vacancies.pydantic_models import PydanticVacancy
 
 
 class CollectVacancies(ExternalApi):
-    NAME_DATA = ""
+    KEY_DATA = ""
+    KEY_TOWN = ""
 
-    def _collect_vacancies(self, platform, town, params):
-        for data in self.get_paginated_data("GET", platform.url, params):
-            vacancies = data.get(self.NAME_DATA)
-            if vacancies:
-                yield [
-                    Vacancy(**self.prepare_data(platform, town, vacancy))
-                    for vacancy in vacancies
-                ]
+    def _collect_vacancies(self, platform, towns, params):
+        for town in towns:
+            params[self.KEY_TOWN] = town.resource_id
+            for data in self.get_paginated_data("GET", platform.url, params):
+                vacancies = data.get(self.KEY_DATA)
+                if vacancies:
+                    yield [
+                        Vacancy(**self.prepare_data(platform, town, vacancy))
+                        for vacancy in vacancies
+                    ]
 
     def prepare_data(self, platform, town, data):
         raise NotImplementedError("Please Implement this method")
 
 
 class PlatformHH(CollectVacancies):
-    NAME_DATA = "items"
+    KEY_DATA = "items"
+    KEY_TOWN = "area"
     LIMIT = 100
-    PAGE = 1
+    LIMIT_DATA = 20
 
-    def collect_vacancies(self, platform, town):
-        if not platform or platform.name != PLATFORM_CODE.HH:
-            return []
+    def collect_vacancies(self, platform, towns):
         params = {
             "per_page": self.LIMIT,
-            "page": self.PAGE,
             "date_from": (datetime.utcnow() - timedelta(days=30)).strftime("%Y-%m-%d"),
-            "area": town.resource_id,
         }
-        return self._collect_vacancies(platform, town, params)
+        return self._collect_vacancies(platform, towns, params)
 
     def prepare_data(self, platform, town, data):
+        data = {key: value for key, value in data.items() if value is not None}
         address = data.get("address", {})
         salary = data.get("salary", {})
         snippet = data.get("snippet", {})
@@ -55,7 +55,7 @@ class PlatformHH(CollectVacancies):
             responsibility=snippet.get("responsibility", ""),
             company="",
             town_id=town.id,
-        )
+        ).dict()
 
     def get_next_page(self, page, response):
         if response.get("pages") == response.get("page"):
@@ -65,14 +65,13 @@ class PlatformHH(CollectVacancies):
 
 class PlatformVK(CollectVacancies):
     LIMIT = 50
-    OFFSET = 0
     DEFAULT_PAGE_NAME = "offset"
+    KEY_DATA = "results"
+    KEY_TOWN = "town"
 
-    def collect_vacancies(self, platform, town):
-        if not platform or platform.name != PLATFORM_CODE.VK:
-            return []
-        params = {"limit": self.LIMIT, "offset": self.OFFSET, "town": town.resource_id}
-        return self._collect_vacancies(platform, town, params)
+    def collect_vacancies(self, platform, towns):
+        params = {"limit": self.LIMIT}
+        return self._collect_vacancies(platform, towns, params)
 
     def prepare_data(self, platform, town, data):
         return PydanticVacancy(
@@ -80,7 +79,7 @@ class PlatformVK(CollectVacancies):
             platform_id=platform.id,
             name=data.get("title", ""),
             town_id=town.id,
-        )
+        ).dict()
 
     def get_next_page(self, page, response):
         if not response.get("next"):

@@ -27,14 +27,18 @@ def collect_vacancies(platform_name):
             .join(AssociationTownPlatform)
             .filter(AssociationTownPlatform.platform_id == platform.id)
         )
-        session.query(Vacancy).filter(Vacancy.platform_id == platform.id).delete()
 
         if platform_name == PLATFORM_CODE.HH:
             platform_api = PlatformHH()
         elif platform_name == PLATFORM_CODE.VK:
             platform_api = PlatformVK()
 
-        for vacancies in platform_api.collect_vacancies(platform, towns[0]):
+        if not platform_api or not towns:
+            _logger.error(f"Some problems in collect_vacancies")
+            return
+
+        session.query(Vacancy).filter(Vacancy.platform_id == platform.id).delete()
+        for vacancies in platform_api.collect_vacancies(platform, towns):
             session.bulk_save_objects(vacancies)
 
         session.commit()
