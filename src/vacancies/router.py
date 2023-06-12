@@ -6,7 +6,6 @@ from elasticsearch import Elasticsearch
 from src.database import get_async_session
 from src.elasticsearch.client import get_es_client
 from src.settings import ELASTIC_INDEX
-from src.vacancies.external_api.platform_api_async import request_vacancy
 from src.vacancies.models import Vacancy
 
 router = APIRouter(
@@ -24,12 +23,12 @@ async def api_vacancies(session: AsyncSession = Depends(get_async_session)):
 
 @router.get("/vacancies/{item_id}")
 async def api_vacancies(
-    item_id: str, session: AsyncSession = Depends(get_async_session)
+    item_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     query = select(Vacancy).where(Vacancy.id == item_id)
     result = await session.execute(query)
     if result:
-        return await request_vacancy(result)
+        return result.fetchone()
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
