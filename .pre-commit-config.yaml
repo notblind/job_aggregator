@@ -9,13 +9,22 @@ repos:
     -   id: detect-private-key
     -   id: check-ast
     -   id: check-added-large-files
--   repo: https://github.com/pycqa/bandit
-    rev: 1.7.0
+    -   id: trailing-whitespace
+    -   id: mixed-line-ending
+-   repo: https://github.com/psf/black
+    rev: 22.3.0
     hooks:
-    -   id: bandit
-        args: [ --exclude, tests ]
+    -   id: black
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v2.7.2
+    hooks:
+    -   id: pyupgrade
+        args:
+            - --keep-percent-format
 -   repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
     -   id: isort
+        exclude: "__init__.py"
+        args: ["-m=3", "--tc", "--gitignore"]
         name: isort (python)
