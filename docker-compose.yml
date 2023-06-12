@@ -71,6 +71,18 @@ services:
     networks:
       - inet
 
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    volumes:
+      - ./frontend/app:/frontend/app
+      - ./frontend/public:/frontend/public
+    networks:
+      - inet
+
 volumes:
   elasticsearch-data:
     driver: local
